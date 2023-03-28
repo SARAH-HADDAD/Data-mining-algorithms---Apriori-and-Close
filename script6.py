@@ -1,5 +1,7 @@
+
 # This function loads the transactional data from a CSV file and converts each transaction into a set of items:
 from itertools import combinations
+import numpy as np 
 def load_data(file_path):
     data = []
     with open(file_path, 'r') as f:
@@ -56,38 +58,75 @@ def get_association_rules(frequent_itemsets, min_confidence, data):
                 antecedent = frozenset(antecedent)
                 consequent = itemset - antecedent
                 antecedent_support = sum(1 for transaction in data if antecedent.issubset(transaction)) / num_transactions
+                consequent_support = sum(1 for transaction in data if consequent.issubset(transaction)) / num_transactions
                 itemset_support = sum(1 for transaction in data if itemset.issubset(transaction)) / num_transactions
                 confidence = itemset_support / antecedent_support
+                lift = confidence / consequent_support
                 if confidence >= min_confidence:
-                    association_rules.append((antecedent, consequent, confidence))
+                    association_rules.append((antecedent, consequent, confidence, lift))
     return association_rules
 
-# Load the data
-data = load_data('insurance.csv')
 
-# Set the minimum support and confidence
-#min_support = 0.2
-
-#cela signifie que seules les règles d'association ayant une corrélation de xx0% ou plus seront acceptées.
-# Liste des valeurs de min_confidence à tester
-min_confidence_range = [0.5, 0.6, 0.7, 0.8, 0.9]
-
-# Boucle pour tester chaque valeur de min_confidence
-for min_confidence in min_confidence_range:
-    # 
+def find_best_lift(data):
     min_support = 0.1
-    frequent_itemsets = get_frequent_itemsets(data, min_support)
-    # Trouver les règles d'association avec la valeur actuelle de min_confidence
-    association_rules = get_association_rules(frequent_itemsets, min_confidence, data)
-    print(len(get_item_counts(data).items()))
-    print(get_item_counts(data).items())
-    while (len(frequent_itemsets)>len(get_item_counts(data).items())/2):
-        min_support += 0.05
-        frequent_itemsets = get_frequent_itemsets(data, min_support)        
-        association_rules = get_association_rules(frequent_itemsets, min_confidence, data)
+    best_lift = None
+    best_support = None
+    min_confidence = 0.5
     
-    # Imprimer les règles d'association et leur performance
-    print(f"Règles d'association pour min_confidence = {min_confidence}:")
-    for antecedent, consequent, confidence in association_rules:
-        print(f"{set(antecedent)} => {set(consequent)} (support={min_support:.3f}, confidence={confidence:.3f})")
-    print("\n\n")
+    while min_support <= 1.0:
+        frequent_itemsets = get_frequent_itemsets(data, min_support)
+        association_rules = get_association_rules(frequent_itemsets, min_confidence, data)
+        lift_value =0
+
+        for antecedent, consequent, confidence,lift in association_rules:
+            if(abs(lift)!=1):
+                lift_value += abs(lift)
+        num_association_rules = len(association_rules)
+        if(num_association_rules>0):
+            lift_value=lift_value/num_association_rules
+        #and lift_value > 1
+        if(best_lift is None): best_lift=lift_value
+        if(best_support is None): best_support=min_support
+        print('min_support',min_support)
+        print('lift_value',lift_value)
+        print('best_lift',best_lift)
+        print('best_support',best_support)
+        print('\n')
+        if num_association_rules>0 and lift_value > best_lift :
+            print("test2")
+            best_lift = lift_value
+            best_support = min_support
+            print("test")
+        if(num_association_rules==0 ):
+            print(min_support)
+            print(best_support)
+            break
+        min_support += 0.1
+    
+    if best_support is not None:
+        print(f"Best lift: {best_lift:.3f} with min_support={best_support}")
+        
+        frequent_itemsets = get_frequent_itemsets(data, best_support)
+        association_rules = get_association_rules(frequent_itemsets, min_confidence, data)
+        
+        print(f"Association rules")
+        
+        for antecedent, consequent, confidence,lift in association_rules:
+            print(f"{set(antecedent)} => {set(consequent)} (support={best_support:.3f}, confidence={confidence:.3f}, lift={lift:.3f})")
+    else:
+        print(f"No association rules found with lift greater than {best_lift}")
+
+#lift(A -> B) = support(A and B) / (support(A) * support(B))
+
+
+data = load_data('bank-data.csv')
+#min_support_range = [0.1, 0.2, 0.3, 0.4, 0.5]
+#lift_range = [1.1, 1.2, 1.3, 1.4, 1.5]
+#min_support_range = np.arange(0.01, 0.51, 0.01)
+find_best_lift(data)
+
+
+
+
+
+
