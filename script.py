@@ -1,16 +1,25 @@
-# This function loads the transactional data from a CSV file and converts each transaction into a set of items:
 from itertools import combinations
+# This function loads the transactional data from a CSV file and converts each transaction into a set of items in order:
+import csv
+
+import csv
+
 def load_data(file_path):
     data = []
     with open(file_path, 'r') as f:
-        for line in f:
-            transaction = line.strip().split(',')
-            data.append(set(transaction))
+        reader = csv.reader(f)
+        header = next(reader) # récupérer la première ligne en tant qu'en-tête
+        for row in reader:
+            data.append(row)
     return data
+
+
 # This function counts the number of times each item appears in the dataset:
 def get_item_counts(data):
     item_counts = {}
     for transaction in data:
+        print(transaction)
+        print("-")
         for item in transaction:
             if item in item_counts:
                 item_counts[item] += 1
@@ -63,7 +72,7 @@ def get_association_rules(frequent_itemsets, min_confidence, data):
     return association_rules
 
 # Load the data
-data = load_data('mydata.csv')
+data = load_data('test.csv')
 
 # Set the minimum support and confidence
 min_support = 0.2
