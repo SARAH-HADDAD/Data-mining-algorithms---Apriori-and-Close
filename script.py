@@ -63,7 +63,7 @@ def get_association_rules(frequent_itemsets, min_confidence, data):
     return association_rules
 
 # Load the data
-data = load_data('data/data.csv')
+data = load_data('mydata.csv')
 
 # Set the minimum support and confidence
 min_support = 0.2
