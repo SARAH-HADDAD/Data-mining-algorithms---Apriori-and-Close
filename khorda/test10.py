@@ -5,7 +5,7 @@ import pdb; pdb.set_trace()
 
 
 # Load the store dataset
-store_data = pd.read_csv('store_dataset.csv')
+store_data = pd.read_csv('data.csv')
 
 # Convert the dataset to a list of transactions
 transactions = []
