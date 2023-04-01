@@ -4,43 +4,46 @@ import csv
 
 def load_data(file_path):
     data = []
-    prices = []  # add this list to store all the "Price in USD" values
+    Profit = []  # add this list to store all the "Price in USD" values
     with open(file_path, 'r') as f:
         reader = csv.reader(f)
         header = next(reader) # récupérer la première ligne en tant qu'en-tête
         for row in reader:
             data.append(row)
-            prices.append(float(row[2])) 
-    return data, prices 
-
+            Profit.append(float(row[2])) 
+    return data, Profit 
 
 # This function counts the number of times each item appears in the dataset:
 def get_item_counts(data,average_price):
     item_counts = {}
-    item_importance = {}
+    item_importance = 0
     for transaction in data:
-        #print(transaction[2])
+        # (transaction[2]) c'est le profit
         if float(transaction[2]) > average_price:
             importance=1
         else:
             importance=0
-        for item in transaction:
-            if item in item_counts:
-                item_counts[item] += 1
-                item_importance[item] += importance
+        for i in range(0, len(transaction)):
+            if transaction[i] in item_counts:
+                item_counts[transaction[i]]["count"] += 1
+                if(i!=2):
+                    item_counts[transaction[i]]["profit"] += importance
+                    item_importance += importance
             else:
-                item_counts[item] = 1
-                item_importance[item] = importance
+                item_counts[transaction[i]]["count"] = 1
+                if(i!=2):
+                    item_counts[transaction[i]]["profit"] += importance
+                    item_importance += importance
+    print('item_importance:',item_importance)
+    print('item_counts:',item_counts)
     return item_counts,item_importance
 # This function generates all frequent itemsets in the dataset that have a support greater than or equal to the specified minimum support:
 def get_frequent_itemsets(data, min_support,average_price):
     item_counts,item_importance = get_item_counts(data,average_price)
     #print(item_counts)
-    num_transactions = len(data)
+    num_transactions = len(data)+item_importance
     min_support_count = num_transactions * min_support
-    frequent_itemsets = [frozenset({item}) for item, count in item_counts.items() if count >= min_support_count]
-    frequentximportant_itemsets = [frozenset({item}) for item, count in item_counts.items() if count >= min_support_count or item_importance.get(item, 0) >= 1]
-    print('frequentximportant_itemsets:',frequentximportant_itemsets)
+    frequent_itemsets = [frozenset({item}) for item, count in item_counts.items() if count["count"] >= min_support_count]
     print('frequent_itemsets:',frequent_itemsets)
     # within each loop iteration, it generates all possible combinations of itemsets of size k
     k = 2
@@ -82,8 +85,8 @@ def get_association_rules(frequent_itemsets, min_confidence, data):
     return association_rules
 
 # Load the data
-data, prices = load_data('test.csv')
-average_price = sum(prices) / len(prices)
+data, Profit = load_data('test.csv')
+average_price = sum(Profit) / len(Profit)
 print(f"The average price in USD is {average_price:.2f}")
 # Set the minimum support and confidence
 min_support = 0.5
