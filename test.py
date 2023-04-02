@@ -27,7 +27,7 @@ def get_item_counts(data):
                 # if the item is not in the dictionary, we add it
                 # the profit of the item is the profit of the transaction
                 item_counts[transaction[i]] = {"count":1,"profit":transaction[2]}
-    print('item_counts:',item_counts)
+    #print('item_counts:',item_counts)
     return item_counts
 # This function generates all frequent itemsets in the dataset that have a support greater than or equal to the specified minimum support:
 def get_frequent_itemsets(data, min_support,Profit):
@@ -36,39 +36,45 @@ def get_frequent_itemsets(data, min_support,Profit):
     num_transactions = len(data)
     # get the sum of Profit of all items
     sum_Profit = sum(Profit)
-    print('sum_Profit:',sum_Profit)
+    #print('sum_Profit:',sum_Profit)
     min_support_count = num_transactions * min_support
     min_support_profit = sum_Profit * min_support
-    frequent_itemsets = [frozenset({item}) for item, count in item_counts.items() if count["count"] >= min_support_count]
-    important_itemsets = [frozenset({item}) for item, count in item_counts.items() if float(count["profit"]) >= min_support_profit]
-    print('important_itemsets:',important_itemsets)
-    print('frequent_itemsets:',frequent_itemsets)
+    print('min_support_count:',min_support_count)
+    print('min_support_profit:',min_support_profit)
+    #frequent_itemsets = [frozenset({item}) for item, count in item_counts.items() if count["count"] >= min_support_count]
+    #important_itemsets = [frozenset({item}) for item, count in item_counts.items() if float(count["profit"]) >= min_support_profit]
+    #print('important_itemsets:',important_itemsets)
+    #print('frequent_itemsets:',frequent_itemsets)
+    importantxfrequent_itemsets = [frozenset({item}) for item, count in item_counts.items() if (count["count"] * float(count["profit"])) >= min_support_profit*min_support_count]
+    print('importantxfrequent_itemsets:',importantxfrequent_itemsets)
     # within each loop iteration, it generates all possible combinations of itemsets of size k
     k = 2
-    while frequent_itemsets:
+    while importantxfrequent_itemsets:
         itemsets = set()
-        for i, itemset1 in enumerate(frequent_itemsets):
-            for itemset2 in frequent_itemsets[i+1:]:
+        for i, itemset1 in enumerate(importantxfrequent_itemsets):
+            for itemset2 in importantxfrequent_itemsets[i+1:]:
                 new_itemset = itemset1.union(itemset2)
                 if len(new_itemset) == k:
                     itemsets.add(new_itemset)
-        frequent_itemsets_k = set()
+        importantxfrequent_itemsets_k = set()
         for itemset in itemsets:
+            # check if the items have a great profit
             itemset_count = sum(1 for transaction in data if itemset.issubset(transaction))
             if itemset_count >= min_support_count:
-                frequent_itemsets_k.add(itemset)
-        if not frequent_itemsets_k:
+                importantxfrequent_itemsets_k.add(itemset)
+        if not importantxfrequent_itemsets_k:
             break
-        frequent_itemsets.extend(frequent_itemsets_k)
+        importantxfrequent_itemsets.extend(importantxfrequent_itemsets_k)
         k += 1
         # The loop continues until there are no more frequent itemsets left to generate. 
-        # print('the list of frequent itemsets is: ', frequent_itemsets)
-    return frequent_itemsets
+        # print('the list of frequent itemsets is: ', importantxfrequent_itemsets)
+    print('the list of frequent and important itemsets is: ', importantxfrequent_itemsets)
+    return importantxfrequent_itemsets
 # This function generates all association rules with a confidence greater than or equal to the specified minimum confidence:
-def get_association_rules(frequent_itemsets, min_confidence, data):
+def get_association_rules(importantxfrequent_itemsets, min_confidence, data):
     num_transactions = len(data)
     association_rules = []
-    for itemset in frequent_itemsets:
+    for itemset in importantxfrequent_itemsets:
         if len(itemset) < 2:
             continue
         for i in range(1, len(itemset)):
@@ -85,7 +91,7 @@ def get_association_rules(frequent_itemsets, min_confidence, data):
 # Load the data
 data, Profit = load_data('test.csv')
 # Set the minimum support and confidence
-min_support = 0.2
+min_support = 0.3
 min_confidence = 0.5
 print(f"Règles d'association pour min_confidence = {min_confidence}:")
 print(f"Règles d'association pour min_support = {min_support}:")
@@ -94,6 +100,6 @@ frequent_itemsets = get_frequent_itemsets(data, min_support,Profit)
 # Trouver les règles d'association avec la valeur actuelle de min_confidence
 association_rules = get_association_rules(frequent_itemsets, min_confidence, data)
 # Imprimer les règles d'association et leur performance
-for antecedent, consequent, confidence in association_rules:
-    print(f"{set(antecedent)} => {set(consequent)} (support={min_support:.3f}, confidence={confidence:.3f})")
-    print("\n\n")
+# for antecedent, consequent, confidence in association_rules:
+#     print(f"{set(antecedent)} => {set(consequent)} (support={min_support:.3f}, confidence={confidence:.3f})")
+#     print("\n\n")
