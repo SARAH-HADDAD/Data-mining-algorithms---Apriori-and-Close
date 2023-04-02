@@ -13,37 +13,35 @@ def load_data(file_path):
             Profit.append(float(row[2])) 
     return data, Profit 
 
-# This function counts the number of times each item appears in the dataset:
-def get_item_counts(data,average_price):
+# This function counts the number of times each item appears in the dataset and the profit of each item:
+def get_item_counts(data):
     item_counts = {}
-    item_importance = 0
     for transaction in data:
         # (transaction[2]) c'est le profit
-        if float(transaction[2]) > average_price:
-            importance=1
-        else:
-            importance=0
         for i in range(0, len(transaction)):
             if transaction[i] in item_counts:
                 item_counts[transaction[i]]["count"] += 1
-                if(i!=2):
-                    item_counts[transaction[i]]["profit"] += importance
-                    item_importance += importance
+                # if the profit of the item is greater than the profit of the item in the dictionary, we replace it
+                if(transaction[2]>item_counts[transaction[i]]["profit"]):item_counts[transaction[i]]["profit"] = transaction[2]
             else:
-                item_counts[transaction[i]]["count"] = 1
-                if(i!=2):
-                    item_counts[transaction[i]]["profit"] += importance
-                    item_importance += importance
-    print('item_importance:',item_importance)
+                # if the item is not in the dictionary, we add it
+                # the profit of the item is the profit of the transaction
+                item_counts[transaction[i]] = {"count":1,"profit":transaction[2]}
     print('item_counts:',item_counts)
-    return item_counts,item_importance
+    return item_counts
 # This function generates all frequent itemsets in the dataset that have a support greater than or equal to the specified minimum support:
-def get_frequent_itemsets(data, min_support,average_price):
-    item_counts,item_importance = get_item_counts(data,average_price)
+def get_frequent_itemsets(data, min_support,Profit):
+    item_counts = get_item_counts(data)
     #print(item_counts)
-    num_transactions = len(data)+item_importance
+    num_transactions = len(data)
+    # get the sum of Profit of all items
+    sum_Profit = sum(Profit)
+    print('sum_Profit:',sum_Profit)
     min_support_count = num_transactions * min_support
+    min_support_profit = sum_Profit * min_support
     frequent_itemsets = [frozenset({item}) for item, count in item_counts.items() if count["count"] >= min_support_count]
+    important_itemsets = [frozenset({item}) for item, count in item_counts.items() if float(count["profit"]) >= min_support_profit]
+    print('important_itemsets:',important_itemsets)
     print('frequent_itemsets:',frequent_itemsets)
     # within each loop iteration, it generates all possible combinations of itemsets of size k
     k = 2
@@ -86,15 +84,13 @@ def get_association_rules(frequent_itemsets, min_confidence, data):
 
 # Load the data
 data, Profit = load_data('test.csv')
-average_price = sum(Profit) / len(Profit)
-print(f"The average price in USD is {average_price:.2f}")
 # Set the minimum support and confidence
-min_support = 0.5
+min_support = 0.2
 min_confidence = 0.5
 print(f"Règles d'association pour min_confidence = {min_confidence}:")
 print(f"Règles d'association pour min_support = {min_support}:")
 # Find the frequent itemsets
-frequent_itemsets = get_frequent_itemsets(data, min_support,average_price)
+frequent_itemsets = get_frequent_itemsets(data, min_support,Profit)
 # Trouver les règles d'association avec la valeur actuelle de min_confidence
 association_rules = get_association_rules(frequent_itemsets, min_confidence, data)
 # Imprimer les règles d'association et leur performance
