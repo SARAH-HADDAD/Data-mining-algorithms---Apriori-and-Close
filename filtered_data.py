@@ -1,6 +1,6 @@
-from itertools import combinations
-# This function loads the transactional data from a CSV file and converts each transaction into a set of items in order:
 import csv
+
+# This function loads the transactional data from a CSV file and converts each transaction into a set of items in order:
 
 def load_data(file_path):
     data = []
@@ -10,7 +10,8 @@ def load_data(file_path):
         header = next(reader) # récupérer la première ligne en tant qu'en-tête
         for row in reader:
             data.append(row)
-            Profit.append(float(row[2])) 
+            print(row[1])
+            Profit.append(float(row[1])) 
     return data, Profit 
 
 # This function counts the number of times each item appears in the dataset and the profit of each item:
@@ -22,11 +23,11 @@ def get_item_counts(data):
             if transaction[i] in item_counts:
                 item_counts[transaction[i]]["count"] += 1
                 # if the profit of the item is greater than the profit of the item in the dictionary, we replace it
-                if(transaction[2]>item_counts[transaction[i]]["profit"]):item_counts[transaction[i]]["profit"] = transaction[2]
+                if(transaction[1]>item_counts[transaction[i]]["profit"]):item_counts[transaction[i]]["profit"] = transaction[1]
             else:
                 # if the item is not in the dictionary, we add it
                 # the profit of the item is the profit of the transaction
-                item_counts[transaction[i]] = {"count":1,"profit":transaction[2]}
+                item_counts[transaction[i]] = {"count":1,"profit":transaction[1]}
     #print('item_counts:',item_counts)
     return item_counts
 
@@ -49,6 +50,7 @@ def has_itemset(transaction, itemsets):
     for itemset in itemsets:
         if set(itemset).issubset(set(transaction)):
             return True
+    print('9iw',transaction)
     return False
 
 # Load the data
