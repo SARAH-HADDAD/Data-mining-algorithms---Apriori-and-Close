@@ -1,4 +1,15 @@
 import numpy as np
+import csv
+
+# This function loads the transactional data from a CSV file and converts each transaction into a set of items:
+def load_data(file_path):
+    data = []
+    with open(file_path, 'r') as f:
+        reader = csv.reader(f)
+        header = next(reader) # récupérer la première ligne en tant qu'en-tête
+        for row in reader:
+            data.append(row)
+    return data
 
 def isSubstring(x,y):
     return all([char in y for char in x])
@@ -77,11 +88,11 @@ def close(itemset,minsup,candidats) :
                     del(candidates[candidates.index(c)])
     return AssociationRules
 
-data= [['A', 'B', 'C', 'D', 'E'],
-       ['A', 'B', 'C', 'D'],
-       ['C', 'E'],
-       ['A', 'B', 'D', 'E'],
-       ['A' , 'C', 'D' ]]
+# Load the data
+data = load_data('test.csv')
+
+# Set the minimum support and confidence
+min_support = 0.1
 
 # Créer un ensemble d'éléments unique
 items = sorted(set([item for transaction in data for item in transaction]))
@@ -90,10 +101,10 @@ items = sorted(set([item for transaction in data for item in transaction]))
 itemset = {}
 for item in items:
     itemset[item] = np.array([1 if item in transaction else 0 for transaction in data])
-
+print(itemset)
 candidates = list(itemset.keys())
 
-AssociationRules= close(itemset,0.4,candidates)
+AssociationRules= close(itemset,min_support,candidates)
 for cle, valeur in AssociationRules.items():
     print(cle, "=> ", valeur)
 
