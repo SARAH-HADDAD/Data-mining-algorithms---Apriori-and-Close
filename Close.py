@@ -17,10 +17,10 @@ candidates = [[c] for c in candidates]
 
 minsup = 2
 k = 1
-
+rules = {}
 while len(candidates) > 0 :
-    print('Generation: ', k)
-    print('candidates:', candidates)
+    #print('Generation: ', k)
+    #print('candidates:', candidates)
     # calculer le support des candidats
     frequent_itemsets = []
     closures = []
@@ -39,6 +39,7 @@ while len(candidates) > 0 :
                     closure.append(item)    
         # si la fermeture de candidat != candidat, alors ajouter à la liste des fermetures
         if closure != candidate:
+            rules[tuple(candidate)] = tuple(closure)
             closures.append(closure)
 
 
@@ -50,11 +51,11 @@ while len(candidates) > 0 :
         support = np.sum(support)
         if support >= minsup:
             frequent_itemsets.append(candidate)
-        print('candidate:', candidate, 'support:', support,'fermeture:', closure)
+        #print('candidate:', candidate, 'support:', support,'fermeture:', closure)
         
 
     # Générer les candidats de taille k + 1 qui ne contiennent pas d'éléments inférieurs
-    print('closures:', closures)
+    #print('closures:', closures)
     candidates = []
     for i in range(len(frequent_itemsets)):
         for j in range(i + 1, len(frequent_itemsets)):
@@ -71,3 +72,4 @@ while len(candidates) > 0 :
                 if is_valid and candidate not in closures :
                     candidates.append(candidate)
     k += 1
+print('rules:', rules)
