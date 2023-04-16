@@ -1,8 +1,5 @@
-a,b,c 
-e,f,g
-b,c,d
-l,f,d
-e,r,f
-a,f,v
-b,c,e
-e,r,g
+A, B, C, D, E
+A, B, C, D
+C, E
+A, B, D, E
+A , C, D

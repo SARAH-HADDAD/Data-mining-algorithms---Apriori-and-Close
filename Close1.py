@@ -1,98 +1,14 @@
 import numpy as np
-import csv
+from itertools import combinations
 
-# This function loads the transactional data from a CSV file and converts each transaction into a set of items:
-def load_data(file_path):
-    data = []
-    with open(file_path, 'r') as f:
-        reader = csv.reader(f)
-        header = next(reader) # récupérer la première ligne en tant qu'en-tête
-        for row in reader:
-            data.append(row)
-    return data
+def generate_combinations(candidates, k):
+    return list(combinations(candidates, k))
 
-def isSubstring(x,y):
-    return all([char in y for char in x])
-    
-def isSubstring_ferm(x,fermeture):
-    for val in fermeture.values():
-        if isSubstring(x,val):
-            return True
-    return False
-
-def new_candidates(candidates):
-    temp=[]
-    taille= len(candidates[0])-1
-    for c1 in candidates :
-        for c2 in candidates :
-            if c1!=c2 :
-                if c1[:taille] == c2[:taille] :
-                    temp.append("".join(sorted(set(c1+c2))))
-    temp = sorted(list(set(temp)))
-    return temp
-
-def sup(item,itemset):
-    temp=np.zeros((itemset[list(itemset.keys())[0]].size,), dtype=int)
-    for char in item :
-        temp += itemset[char]
-    sup = np.count_nonzero(temp == (len(item)))/itemset[list(itemset.keys())[0]].size
-    return sup
-
-def ferm(item,itemset,candidates):
-    itemset2= itemset
-    fermeture = ""
-    for c in candidates :
-        if len(c)>= 1 : 
-                for i in range(1,len(c)) :
-                    temp= np.bitwise_and(itemset2[c[i-1]],itemset2[c[i]]) 
-                    itemset2[c]= temp
-        if (np.array_equal(np.bitwise_or(itemset2[c],itemset2[item]),itemset2[c])) : 
-            fermeture+=c
-            pass
-    return ''.join(sorted(list(set(fermeture))))
-
-def close(itemset,minsup,candidats) :
-    candidates = candidats
-    fermetures = {}
-    AssociationRules = {}
-    it=1
-    while candidates != [] :
-        fermetures = {}
-        it+=1
-        candidates2=[]
-
-        i = 0
-        n = len(candidates)
-        while i < n :
-            c = candidates[i]
-
-            if sup(c,itemset) < minsup :
-                candidates2.append(c)
-                del(candidates[candidates.index(c)])
-                n-=1
-            else :
-                i+=1
-
-        for c in candidates :
-            fermetures[c]=ferm(c,itemset,candidates)
-            if (sup(c,itemset) >= minsup) and (len(c)!=len(fermetures[c])) :
-                fermetures_c = fermetures[c]
-                for char in c:
-                    fermetures_c = fermetures_c.replace(char, '')
-                AssociationRules[c]= fermetures_c
-
-        if candidates != [] :
-            candidates = new_candidates(candidates)
-            for c in candidates :
-                if isSubstring_ferm(c,fermetures) :
-                    del(candidates[candidates.index(c)])
-    return AssociationRules
-
-# Load the data
-data = load_data('test.csv')
-
-# Set the minimum support and confidence
-min_support = 0.1
+data = [['Apple', 'Banana', 'Lemon', 'Kiwi', 'Fig'],
+       ['Apple', 'Banana', 'Lemon', 'Kiwi'],
+       ['Pear', 'Fig'],
+       ['Apple', 'Banana', 'Kiwi', 'Fig'],
+       ['Apple', 'Lemon', 'Kiwi']]
 
 # Créer un ensemble d'éléments unique
 items = sorted(set([item for transaction in data for item in transaction]))
@@ -101,11 +17,45 @@ items = sorted(set([item for transaction in data for item in transaction]))
 itemset = {}
 for item in items:
     itemset[item] = np.array([1 if item in transaction else 0 for transaction in data])
-print(itemset)
+#print(itemset)
 candidates = list(itemset.keys())
 
-AssociationRules= close(itemset,min_support,candidates)
-for cle, valeur in AssociationRules.items():
-    print(cle, "=> ", valeur)
+# mettre chaque candidat dans une liste imbriquée
+for i in range(len(candidates)):
+    candidates[i] = [candidates[i]]
+
+#print(candidates)
+
+base = list(itemset.keys())
+minsup = 2/5
+k = 1
+
+# tant que ensemble de candidats est non vide faire
+while len(candidates) > 0:
+    # Calculer le support des candidats
+    for candidate in candidates:
+        for i in range(len(candidate)):
+            if i == 0:
+                support = itemset[candidate[i]]
+            else:
+                support = support & itemset[candidate[i]]
+        support = np.sum(support)
+        print('candidate:', candidate)
+        print('support:', support)
+
+    k += 1
+    new_combinations = generate_combinations(base, k)
+    new_candidates = []
+        
+    if candidates != []:
+        for c in new_combinations:
+            new_candidates.append(list(c))
+        print('_'*20)    
+        print('new_candidates:', new_candidates)
+        print('_'*20)
+
+    candidates = new_candidates
+
+
 
 
