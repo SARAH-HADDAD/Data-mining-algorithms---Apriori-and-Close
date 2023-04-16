@@ -1,73 +1,55 @@
+from collections import defaultdict
 import numpy as np
-from itertools import combinations
+def calculate_support(itemset, transactions):
+    count = 0
+    for transaction in transactions:
+        if set(itemset).issubset(set(transaction)):
+            count += 1
+    return count
 
-def generate_combinations(candidates, k):
-    return list(combinations(candidates, k))
+def calculate_closure(itemset, K):
+    closure = set(itemset)
+    i = 0
+    while i < len(K):
+        if set(K[i]).issubset(closure):
+            closure = closure.union(set(K[i]))
+            K.pop(i)
+        else:
+            i += 1
+    return closure
 
-data = [['Apple', 'Banana', 'Lemon', 'Kiwi', 'Fig'],
-       ['Apple', 'Banana', 'Lemon', 'Kiwi'],
-       ['Pear', 'Fig'],
-       ['Apple', 'Banana', 'Kiwi', 'Fig'],
-       ['Apple', 'Lemon', 'Kiwi']]
-
-# Créer un ensemble d'éléments unique
-items = sorted(set([item for transaction in data for item in transaction]))
-
+def close_algorithm(candidate_itemsets, minsup, transactions):
+    frequent_closed_itemsets = set()
+    k=1
+    #print('Candidate itemsets: ', candidate_itemsets)
+    while candidate_itemsets != [] and k <= 3:
+        frequent_itemsets = []
+        print('Generation: ', k)
+        for item in candidate_itemsets:
+            print('Item: ',item)
+            support = calculate_support(item, transactions)
+            print('Support: ', support)
+            if support >= minsup:
+                frequent_itemsets.append(item)
+        
+        for i in range(len(frequent_itemsets)-1):
+            for j in range(i+1, len(frequent_itemsets)):
+                itemset = sorted(set(frequent_itemsets[i]).union(set(frequent_itemsets[j])))
+                if len(itemset) > len(frequent_itemsets[0]) and itemset not in candidate_itemsets:
+                    candidate_itemsets.append(itemset)
+        k=k+1
+    print('Frequent itemsets: ', frequent_itemsets)
+                    
+data = [['A', 'B', 'C', 'E'], ['A', 'B', 'C', 'D', 'E'], ['A', 'B'], ['C', 'E'], ['A', 'C', 'D']]
+candidate_itemsets = sorted(set([item for transaction in data for item in transaction]))
 # Créer un dictionnaire avec les éléments comme clés et des vecteurs binaires correspondants
 itemset = {}
-for item in items:
+for item in candidate_itemsets:
     itemset[item] = np.array([1 if item in transaction else 0 for transaction in data])
 #print(itemset)
 candidates = list(itemset.keys())
+minsup = 2
 
-# mettre chaque candidat dans une liste imbriquée
-for i in range(len(candidates)):
-    candidates[i] = [candidates[i]]
+frequent_closed_itemsets = close_algorithm(candidate_itemsets, minsup, data)
 
-#print(candidates)
-
-base = list(itemset.keys())
-minsup = 2/5
-k = 1
-
-# tant que ensemble de candidats est non vide faire
-while len(candidates) > 0:
-    #1) Calculer le support des candidats
-    #2) Élaguer l’ensemble de candidats par rapport à minsup
-    Elaguer = []
-    for candidate in candidates:
-        for i in range(len(candidate)):
-            if i == 0:
-                support = itemset[candidate[i]]
-            else:
-                support = support & itemset[candidate[i]]
-        support = np.sum(support)/len(data)
-        if support < minsup:
-            Elaguer.append(candidate)
-            candidates.remove(candidate)
-        #print('candidate:', candidate)
-        #print('support:', support)
-    #print('candidates:', candidates)
-
-    k += 1
-    new_combinations = generate_combinations(base, k)
-    new_candidates = []
-        
-    if candidates != []:
-        for c in new_combinations:
-            #print('Elaguer:',Elaguer)
-            # if c contais a subset of Elaguer
-            for x in Elaguer:
-                print('x:', x)
-                # if all elements of x are in c
-                if all(elem in c for elem in x):
-                    print("c contais a subset of Elaguer")
-                    print('c:', c)                
-            c_list = list(c)
-            new_candidates.append(list(c))
-
-        #print('_'*20)    
-        #print('new_candidates:', new_candidates)
-        #print('_'*20)
-
-    candidates = new_candidates
+print(frequent_closed_itemsets)
