@@ -1,7 +1,7 @@
 import numpy as np
 from itertools import combinations
 
-data = [['A', 'B', 'D', 'E'], ['A', 'B', 'C', 'D', 'E'], ['A', 'B'], ['C', 'E'], ['A',  'C', 'D']]
+data = [['A', 'B', 'C', 'D', 'E'], ['A', 'B'], ['C', 'E'],['A', 'B', 'D', 'E'], ['A','C', 'D']]
 
 # Créer un ensemble d'éléments unique
 items = sorted(set([item for transaction in data for item in transaction]))
@@ -25,16 +25,18 @@ while len(candidates) > 0 :
     frequent_itemsets = []
     closures = {}
     for candidate in candidates:
-        if (len(candidate)==1):
-            fermeture = [candidate[0]]
-            # chercher les éléments qui sont dans le même itemset que le premier élément de candidat
-        else:
-            # faire l'intersection des itemsets de tous les éléments de candidat
-            fermeture = []
-            
+        # trouver la fermeture de candidat
+        closure = []
+        intersection = itemset[candidate[0]]
+        for i in range(1, len(candidate)):
+            intersection = intersection & itemset[candidate[i]]
         for item in items:
-            if itemset[item][itemset[candidate[0]] == 1].all():
-                fermeture.append(item)
+            if(k<2):
+                if itemset[item][itemset[candidate[0]] == 1].all():
+                    closure.append(item)
+            else:
+                if itemset[item][intersection == 1].all():
+                    closure.append(item)    
 
 
         support = itemset[candidate[0]]
@@ -45,7 +47,8 @@ while len(candidates) > 0 :
         support = np.sum(support)
         if support >= minsup:
             frequent_itemsets.append(candidate)
-        print('candidate:', candidate, 'support:', support,'fermeture:', fermeture)
+        print('candidate:', candidate, 'support:', support,'fermeture:', closure)
+        #if(k>1):print('intersection:', intersection)
 
 
        
