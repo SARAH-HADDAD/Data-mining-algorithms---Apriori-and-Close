@@ -1,7 +1,11 @@
 import numpy as np
 from itertools import combinations
 
-data = [['A', 'B', 'C', 'D', 'E'], ['A', 'B'], ['C', 'E'],['A', 'B', 'D', 'E'], ['A','C', 'D']]
+data = [['Apple', 'Banana', 'Lemon', 'Kiwi', 'Fig'],
+       ['Apple', 'Banana', 'Lemon', 'Kiwi'],
+       ['Pear', 'Fig'],
+       ['Apple', 'Banana', 'Kiwi', 'Fig'],
+       ['Apple', 'Lemon', 'Kiwi']]
 
 # Créer un ensemble d'éléments unique
 items = sorted(set([item for transaction in data for item in transaction]))
@@ -72,4 +76,6 @@ while len(candidates) > 0 :
                 if is_valid and candidate not in closures :
                     candidates.append(candidate)
     k += 1
-print('rules:', rules)
+print('rules:')
+for key, value in rules.items():
+    print(f"{key} --> {value}")
