@@ -1,11 +1,7 @@
 import numpy as np
 from itertools import combinations
 
-data = [['Apple', 'Banana', 'Lemon', 'Kiwi', 'Fig'],
-       ['Apple', 'Banana', 'Lemon', 'Kiwi'],
-       ['Pear', 'Fig'],
-       ['Apple', 'Banana', 'Kiwi', 'Fig'],
-       ['Apple', 'Lemon', 'Kiwi']]
+data = [['A', 'B', 'D', 'E'], ['A', 'B', 'C', 'D', 'E'], ['A', 'B'], ['C', 'E'], ['A',  'C', 'D']]
 
 # Créer un ensemble d'éléments unique
 items = sorted(set([item for transaction in data for item in transaction]))
@@ -22,7 +18,7 @@ candidates = [[c] for c in candidates]
 minsup = 2
 k = 1
 
-while len(candidates) > 0 and k < 4:
+while len(candidates) > 0 :
     print('Generation: ', k)
     print('candidates:', candidates)
     # calculer le support des candidats
@@ -34,6 +30,7 @@ while len(candidates) > 0 and k < 4:
         support = np.sum(support)
         if support >= minsup:
             frequent_itemsets.append(candidate)
+        print('candidate:', candidate, 'support:', support)
 
     # Générer les candidats de taille k + 1 qui ne contiennent pas d'éléments inférieurs
     candidates = []
