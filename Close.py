@@ -1,11 +1,18 @@
 import numpy as np
 from itertools import combinations
+import csv
+from collections import defaultdict
 
-data = [['Apple', 'Banana', 'Lemon', 'Kiwi', 'Fig'],
-       ['Apple', 'Banana', 'Lemon', 'Kiwi'],
-       ['Pear', 'Fig'],
-       ['Apple', 'Banana', 'Kiwi', 'Fig'],
-       ['Apple', 'Lemon', 'Kiwi']]
+def load_data(file_path):
+    data = []
+    with open(file_path, 'r') as f:
+        reader = csv.reader(f)
+        header = next(reader)
+        for row in reader:
+            data.append(row)
+    return data
+
+data = load_data('test.csv')
 
 # Créer un ensemble d'éléments unique
 items = sorted(set([item for transaction in data for item in transaction]))
