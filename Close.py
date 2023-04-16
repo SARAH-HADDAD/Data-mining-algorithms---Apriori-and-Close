@@ -13,7 +13,7 @@ def load_data(file_path):
     return data
 
 data = load_data('test.csv')
-
+print(data)
 # Créer un ensemble d'éléments unique
 items = sorted(set([item for transaction in data for item in transaction]))
 
@@ -26,7 +26,7 @@ for item in items:
 candidates = list(itemset.keys())
 candidates = [[c] for c in candidates]
 
-minsup = 2
+minsup = 0.5
 k = 1
 rules = {}
 while len(candidates) > 0 :
@@ -50,6 +50,8 @@ while len(candidates) > 0 :
                     closure.append(item)    
         # si la fermeture de candidat != candidat, alors ajouter à la liste des fermetures
         if closure != candidate:
+            # remove candidate in closure
+            closure= [x for x in closure if x not in candidate]
             rules[tuple(candidate)] = tuple(closure)
             closures.append(closure)
 
@@ -59,7 +61,7 @@ while len(candidates) > 0 :
             support = support & itemset[candidate[i]]
         # trouver la fermeture de candidat
 
-        support = np.sum(support)
+        support = np.sum(support)/len(data)
         if support >= minsup:
             frequent_itemsets.append(candidate)
         #print('candidate:', candidate, 'support:', support,'fermeture:', closure)
