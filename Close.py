@@ -23,7 +23,7 @@ while len(candidates) > 0 :
     print('candidates:', candidates)
     # calculer le support des candidats
     frequent_itemsets = []
-    closures = {}
+    closures = []
     for candidate in candidates:
         # trouver la fermeture de candidat
         closure = []
@@ -37,6 +37,9 @@ while len(candidates) > 0 :
             else:
                 if itemset[item][intersection == 1].all():
                     closure.append(item)    
+        # si la fermeture de candidat != candidat, alors ajouter à la liste des fermetures
+        if closure != candidate:
+            closures.append(closure)
 
 
         support = itemset[candidate[0]]
@@ -48,13 +51,10 @@ while len(candidates) > 0 :
         if support >= minsup:
             frequent_itemsets.append(candidate)
         print('candidate:', candidate, 'support:', support,'fermeture:', closure)
-        #if(k>1):print('intersection:', intersection)
-
-
-       
         
 
     # Générer les candidats de taille k + 1 qui ne contiennent pas d'éléments inférieurs
+    print('closures:', closures)
     candidates = []
     for i in range(len(frequent_itemsets)):
         for j in range(i + 1, len(frequent_itemsets)):
