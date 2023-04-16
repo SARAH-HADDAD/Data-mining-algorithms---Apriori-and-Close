@@ -65,9 +65,9 @@ while len(candidates) > 0 :
                 # vérifier que tous les k-1 itemsets de candidat sont fréquents
                 is_valid = True
                 for subset in combinations(candidate, k):
-                    if list(subset) not in frequent_itemsets:
+                    if list(subset) not in frequent_itemsets :
                         is_valid = False
                         break
-                if is_valid:
+                if is_valid and candidate not in closures :
                     candidates.append(candidate)
     k += 1
