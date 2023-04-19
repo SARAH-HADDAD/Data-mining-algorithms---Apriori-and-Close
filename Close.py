@@ -9,7 +9,8 @@ def load_data(file_path):
         header = next(reader)
         data = [row for row in reader]
     return data
-def fermeture(itemset, candidate,k):
+
+def fermeture(itemset, candidate,k,items):
     closure = []
     intersection = itemset[candidate[0]]
     for i in range(1, len(candidate)):
@@ -49,8 +50,18 @@ while len(candidates) > 0:
     closures = []
     for candidate in candidates:
         # trouver la fermeture de candidat
-        closure = fermeture(itemset, candidate,k)
-        
+        closure = []
+        intersection = itemset[candidate[0]]
+        for i in range(1, len(candidate)):
+            intersection = intersection & itemset[candidate[i]]
+        for item in items:
+            if (k < 2):
+                if itemset[item][itemset[candidate[0]] == 1].all():
+                    closure.append(item)
+            else:
+                if itemset[item][intersection == 1].all():
+                    closure.append(item)
+
         # Calculate the support of the candidate
         support = itemset[candidate[0]]
         for i in range(1, len(candidate)):
@@ -63,8 +74,8 @@ while len(candidates) > 0:
         
         # si la fermeture de candidat != candidat, alors ajouter à la liste des fermetures
         if closure != candidate and support >= minsup:
-            closure = [x for x in closure if x not in candidate]
-            rules[tuple(candidate)] = tuple(closure)
+            Rclosure = [x for x in closure if x not in candidate]
+            rules[tuple(candidate)] = tuple(Rclosure)
             closures.append(closure)
 
     # Générer les candidats de taille k + 1 qui ne contiennent pas d'éléments inférieurs
@@ -78,10 +89,14 @@ while len(candidates) > 0:
                 candidate = frequent_itemsets[i] + [frequent_itemsets[j][-1]]
                 # vérifier que tous les k-1 itemsets de candidat sont fréquents
                 is_valid = all(list(subset) in frequent_itemsets for subset in combinations(candidate, k))
-                if is_valid and candidate not in closures:
+                # candidate est valid si il n'est pas un subset de la closure
+                for lst in closures:
+                    if set(candidate).issubset(set(lst)):
+                        is_valid = False
+                if (is_valid) and (candidate not in closures)  :
                     candidates.append(candidate)
     k += 1
-
+    print(closures)
 # Print the rules    
 print('rules:')
 for key, value in rules.items():
