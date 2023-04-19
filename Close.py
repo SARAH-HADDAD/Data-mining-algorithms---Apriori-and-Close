@@ -32,7 +32,7 @@ for item in items:
 # candidates initiaux
 candidates = [[c] for c in itemset.keys()]
 
-minsup = 2/5
+minsup = 0.2
 k = 1
 rules = {}
 while len(candidates) > 0:
@@ -64,7 +64,10 @@ while len(candidates) > 0:
         # si la fermeture de candidat != candidat, alors ajouter à la liste des fermetures
         if closure != candidate and support >= minsup:
             Rclosure = [x for x in closure if x not in candidate]
-            rules[tuple(candidate)] = tuple(Rclosure)
+            # calcule Lift:
+            # support(A U B) / (support(A) * support(B))
+            rules[tuple(candidate)] = tuple(Rclosure), round(support,2)
+            #print('candidate:', candidate,support, 'fermeture:', closure,CalculateSupport(itemset,closure ,len(data)), 'Rclosure:', Rclosure,support*CalculateSupport(itemset,Rclosure ,len(data)))
             closures.append(closure)
 
     # Générer les candidats de taille k + 1 qui ne contiennent pas d'éléments inférieurs

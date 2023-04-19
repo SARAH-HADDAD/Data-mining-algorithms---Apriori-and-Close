@@ -59,4 +59,27 @@ def get_association_rules(frequent_itemsets, min_confidence, data):
                     association_rules.append((antecedent, consequent, confidence))
     return association_rules
 
-print("cc it's apriori.py")
+
+# Load data
+data = load_data('Supermart_Grocery_Sales.csv')
+# Set minimum support and minimum confidence thresholds
+min_support = 0.5
+min_confidence = 0.5
+
+test = ['InvoiceNo', 'StockCode', 'Description', 'Quantity', 'InvoiceDate', 'UnitPrice', 'CustomerID', 'Country']
+
+# Select the column to use for
+print("Column names:", list(test))
+column = str(input("Enter the column to use for item weights: "))
+print(column)
+print('test')
+frequent_itemsets = get_frequent_itemsets(data, min_support)
+association_rules = get_association_rules(frequent_itemsets, min_confidence,data)
+print("Frequent itemsets:")
+for itemset in frequent_itemsets:
+    print(list(itemset))
+
+print("\nAssociation rules:")
+for antecedent, consequent, confidence in association_rules:
+    print(list(antecedent), "=>", list(consequent), ", confidence:", round(confidence, 2), ")")
+print("\n")
