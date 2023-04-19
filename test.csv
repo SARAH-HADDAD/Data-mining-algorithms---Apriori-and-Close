@@ -1,5 +1,6 @@
-Apple, Banana, Lemon, Kiwi, Fig
-Apple, Banana, Lemon, Kiwi
-Pear, Fig
-Apple, Banana, Kiwi, Fig
-Apple, Lemon, Kiwi
+item1,item2,item3,item4,item5
+A,B,C,D,E
+A,B
+C,E
+A,B,D,E
+A,C,D
