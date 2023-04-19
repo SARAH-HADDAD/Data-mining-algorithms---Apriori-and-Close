@@ -10,19 +10,12 @@ def load_data(file_path):
         data = [row for row in reader]
     return data
 
-def fermeture(itemset, candidate,k,items):
-    closure = []
-    intersection = itemset[candidate[0]]
+def CalculateSupport(itemset,candidate ,num_transactions):
+    support = itemset[candidate[0]]
     for i in range(1, len(candidate)):
-        intersection = intersection & itemset[candidate[i]]
-        for item in items:
-            if (k < 2):
-                if itemset[item][itemset[candidate[0]] == 1].all() :
-                    closure.append(item)
-            else:
-                if itemset[item][intersection == 1].all():
-                    closure.append(item)
-    return closure
+        support = support & itemset[candidate[i]]
+    support = np.sum(support)/num_transactions
+    return support
 
 data = load_data('test.csv')
 #print(data)
@@ -61,13 +54,9 @@ while len(candidates) > 0:
             else:
                 if itemset[item][intersection == 1].all():
                     closure.append(item)
-
         # Calculate the support of the candidate
-        support = itemset[candidate[0]]
-        for i in range(1, len(candidate)):
-            support = support & itemset[candidate[i]]
+        support=CalculateSupport(itemset,candidate ,len(data))
 
-        support = np.sum(support)/len(data)
         if support >= minsup:
             frequent_itemsets.append(candidate)
         #print('candidate:', candidate, 'support:',support, 'fermeture:', closure)
