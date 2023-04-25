@@ -41,6 +41,7 @@ def get_weighted_itemsets(data, min_support,weights):
     #print('frequent ',weighted_itemsets)
     k = 2
     while weighted_itemsets:
+        print(k)
         itemsets = set()
         for i, itemset1 in enumerate(weighted_itemsets):
             for itemset2 in weighted_itemsets[i+1:]:
@@ -69,16 +70,17 @@ def get_association_rules(weighted_itemsets, min_confidence, data,weights):
                 antecedent_support = calculate_wsp(antecedent,data,weights)
                 itemset_support = calculate_wsp(itemset,data,weights)
                 confidence = itemset_support / antecedent_support
-                if confidence >= min_confidence:
+                test= antecedent_support/itemset_support 
+                if confidence >= min_confidence :
                     association_rules.append((antecedent, consequent, confidence))
     return association_rules
 
 
 
 # Set minimum support and minimum confidence thresholds
-min_support = 0.2
+min_support = 0.05
 min_confidence = 0.5
-data,Profit = load_data('SampleSuperstore.csv',11)
+data,Profit = load_data('Supermart_Grocery_Sales.csv',9)
 # Select the column to use for
 #print("Column names:", list(test))
 #column = int(input("Enter the column to use for item weights: "))
