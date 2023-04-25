@@ -2,17 +2,28 @@ from itertools import combinations
 import csv
 from collections import defaultdict
 
-def load_data(file_path):
+def load_data(file_path,column):
     data = []
+    Profit = []
     with open(file_path, 'r') as f:
         reader = csv.reader(f)
         header = next(reader)
+        print(header)
         for row in reader:
             data.append(row)
-    return data
+            Profit.append(float(row[column])) 
+    return data, Profit
+
+# Function to calculate weighted support
+def calculate_wsp(itemset, transactions, weights):
+    total_weight = sum(weights)
+    itemset_weight = sum([weights[i] for i, transaction in enumerate(transactions) if set(itemset).issubset(set(transaction))])
+    print(itemset)
+    print(itemset_weight / total_weight)
+    return itemset_weight / total_weight
 
 def get_item_counts(data):
-    item_counts = defaultdict(int)
+    item_counts = defaultdict(int) 
     for transaction in data:
         for item in transaction:
             item_counts[item] += 1
@@ -60,24 +71,24 @@ def get_association_rules(frequent_itemsets, min_confidence, data):
     return association_rules
 
 
-# Load data
-data = load_data('Supermart_Grocery_Sales.csv')
+
 # Set minimum support and minimum confidence thresholds
 min_support = 0.5
 min_confidence = 0.5
-
-test = ['InvoiceNo', 'StockCode', 'Description', 'Quantity', 'InvoiceDate', 'UnitPrice', 'CustomerID', 'Country']
-
+#min_significance = 0.5
+# Load data
+data,Profit = load_data('test.csv',3)
 # Select the column to use for
-print("Column names:", list(test))
-column = str(input("Enter the column to use for item weights: "))
-print(column)
-print('test')
+#print("Column names:", list(test))
+#column = int(input("Enter the column to use for item weights: "))
+#print(column)
+#print('test')
+calculate_wsp(['B', 'D'], data, Profit)
 frequent_itemsets = get_frequent_itemsets(data, min_support)
 association_rules = get_association_rules(frequent_itemsets, min_confidence,data)
-print("Frequent itemsets:")
-for itemset in frequent_itemsets:
-    print(list(itemset))
+#print("Frequent itemsets:")
+#for itemset in frequent_itemsets:
+#    print(list(itemset))
 
 print("\nAssociation rules:")
 for antecedent, consequent, confidence in association_rules:
