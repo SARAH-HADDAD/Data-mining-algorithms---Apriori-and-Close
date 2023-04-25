@@ -29,17 +29,17 @@ def get_item_weight(data,weights):
             item_weights[item] =calculate_wsp(item,data,weights)
     return item_weights
 
-def get_frequent_itemsets(data, min_support,weights):
+def get_weighted_itemsets(data, min_support,weights):
     item_weights = get_item_weight(data,weights)
     #total_weight = sum(weights)
-    #frequent_itemsets = [frozenset({item}) for transaction in data for item in transaction if calculate_wsp(frozenset({item}), data, weights) >= min_support]
-    frequent_itemsets = [frozenset({item}) for item, count in item_weights.items() if count >= min_support]
-    print('frequent ',frequent_itemsets)
+    #weighted_itemsets = [frozenset({item}) for transaction in data for item in transaction if calculate_wsp(frozenset({item}), data, weights) >= min_support]
+    weighted_itemsets = [frozenset({item}) for item, count in item_weights.items() if count >= min_support]
+    print('frequent ',weighted_itemsets)
     k = 2
-    while frequent_itemsets:
+    while weighted_itemsets:
         itemsets = set()
-        for i, itemset1 in enumerate(frequent_itemsets):
-            for itemset2 in frequent_itemsets[i+1:]:
+        for i, itemset1 in enumerate(weighted_itemsets):
+            for itemset2 in weighted_itemsets[i+1:]:
                 new_itemset = itemset1.union(itemset2)
                 if len(new_itemset) == k:
                     itemsets.add(new_itemset)
@@ -50,22 +50,22 @@ def get_frequent_itemsets(data, min_support,weights):
                 frequent_itemsets_k.add(itemset)
         if not frequent_itemsets_k:
             break
-        frequent_itemsets.extend(frequent_itemsets_k)
+        weighted_itemsets.extend(frequent_itemsets_k)
         k += 1
-    return frequent_itemsets
+    return weighted_itemsets
 
-def get_association_rules(frequent_itemsets, min_confidence, data):
-    num_transactions = len(data)
+def get_association_rules(weighted_itemsets, min_confidence, data,weights):
+    #num_transactions = len(data)
     association_rules = []
-    for itemset in frequent_itemsets:
+    for itemset in weighted_itemsets:
         if len(itemset) < 2:
             continue
         for i in range(1, len(itemset)):
             for antecedent in combinations(itemset, i):
                 antecedent = frozenset(antecedent)
                 consequent = itemset - antecedent
-                antecedent_support = sum(1 for transaction in data if antecedent.issubset(transaction)) / num_transactions
-                itemset_support = sum(1 for transaction in data if itemset.issubset(transaction)) / num_transactions
+                antecedent_support = calculate_wsp(antecedent,data,weights)
+                itemset_support = calculate_wsp(itemset,data,weights)
                 confidence = itemset_support / antecedent_support
                 if confidence >= min_confidence:
                     association_rules.append((antecedent, consequent, confidence))
@@ -84,13 +84,13 @@ data,Profit = load_data('test.csv',3)
 #column = int(input("Enter the column to use for item weights: "))
 #print(column)
 #print('test')
-frequent_itemsets = get_frequent_itemsets(data, min_support,Profit)
-#association_rules = get_association_rules(frequent_itemsets, min_confidence,data)
+weighted_itemsets = get_weighted_itemsets(data, min_support,Profit)
+association_rules = get_association_rules(weighted_itemsets, min_confidence,data,Profit)
 print("Frequent itemsets:")
-for itemset in frequent_itemsets:
+for itemset in weighted_itemsets:
     print(list(itemset))
 
-#print("\nAssociation rules:")
-#for antecedent, consequent, confidence in association_rules:
-#    print(list(antecedent), "=>", list(consequent), ", confidence:", round(confidence, 2), ")")
-#print("\n")
+print("\nAssociation rules:")
+for antecedent, consequent, confidence in association_rules:
+    print(list(antecedent), "=>", list(consequent), ", confidence:", round(confidence, 2), ")")
+print("\n")
