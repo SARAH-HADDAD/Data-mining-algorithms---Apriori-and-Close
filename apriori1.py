@@ -18,22 +18,23 @@ def load_data(file_path,column):
 def calculate_wsp(itemset, transactions, weights):
     total_weight = sum(weights)
     itemset_weight = sum([weights[i] for i, transaction in enumerate(transactions) if set(itemset).issubset(set(transaction))])
-    print(itemset)
-    print(itemset_weight / total_weight)
+    #print(itemset)
+    #print(itemset_weight / total_weight)
     return itemset_weight / total_weight
 
-def get_item_counts(data):
-    item_counts = defaultdict(int) 
+def get_item_weight(data,weights):
+    item_weights = defaultdict(int) 
     for transaction in data:
         for item in transaction:
-            item_counts[item] += 1
-    return item_counts
+            item_weights[item] =calculate_wsp(item,data,weights)
+    return item_weights
 
-def get_frequent_itemsets(data, min_support):
-    item_counts = get_item_counts(data)
-    num_transactions = len(data)
-    min_support_count = num_transactions * min_support
-    frequent_itemsets = [frozenset({item}) for item, count in item_counts.items() if count >= min_support_count]
+def get_frequent_itemsets(data, min_support,weights):
+    item_weights = get_item_weight(data,weights)
+    #total_weight = sum(weights)
+    #frequent_itemsets = [frozenset({item}) for transaction in data for item in transaction if calculate_wsp(frozenset({item}), data, weights) >= min_support]
+    frequent_itemsets = [frozenset({item}) for item, count in item_weights.items() if count >= min_support]
+    print('frequent ',frequent_itemsets)
     k = 2
     while frequent_itemsets:
         itemsets = set()
@@ -44,8 +45,8 @@ def get_frequent_itemsets(data, min_support):
                     itemsets.add(new_itemset)
         frequent_itemsets_k = set()
         for itemset in itemsets:
-            itemset_count = sum(1 for transaction in data if itemset.issubset(transaction))
-            if itemset_count >= min_support_count:
+            #itemset_count = sum(1 for transaction in data if itemset.issubset(transaction))
+            if  calculate_wsp(itemset,data,weights)>= min_support:
                 frequent_itemsets_k.add(itemset)
         if not frequent_itemsets_k:
             break
@@ -83,14 +84,13 @@ data,Profit = load_data('test.csv',3)
 #column = int(input("Enter the column to use for item weights: "))
 #print(column)
 #print('test')
-calculate_wsp(['B', 'D'], data, Profit)
-frequent_itemsets = get_frequent_itemsets(data, min_support)
-association_rules = get_association_rules(frequent_itemsets, min_confidence,data)
-#print("Frequent itemsets:")
-#for itemset in frequent_itemsets:
-#    print(list(itemset))
+frequent_itemsets = get_frequent_itemsets(data, min_support,Profit)
+#association_rules = get_association_rules(frequent_itemsets, min_confidence,data)
+print("Frequent itemsets:")
+for itemset in frequent_itemsets:
+    print(list(itemset))
 
-print("\nAssociation rules:")
-for antecedent, consequent, confidence in association_rules:
-    print(list(antecedent), "=>", list(consequent), ", confidence:", round(confidence, 2), ")")
-print("\n")
+#print("\nAssociation rules:")
+#for antecedent, consequent, confidence in association_rules:
+#    print(list(antecedent), "=>", list(consequent), ", confidence:", round(confidence, 2), ")")
+#print("\n")
