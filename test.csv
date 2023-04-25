@@ -1,6 +1,6 @@
 item1,item2,item3,Profit
-A,B,C,10
-A,B,E,30
-C,E,A,50
-A,B,D,20
-A,C,D,30
+Cherry,Pear,Watermelon,10
+Cherry,Pear,Watermelon,30
+Banana,Apricot,Watermelon,50
+Apple,Banana,Watermelon,20
+Apple,Apricot,Pear,30

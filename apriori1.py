@@ -1,5 +1,5 @@
-from itertools import combinations
 import csv
+from itertools import combinations
 from collections import defaultdict
 
 def load_data(file_path,column):
@@ -16,8 +16,20 @@ def load_data(file_path,column):
 
 # Function to calculate weighted support
 def calculate_wsp(itemset, transactions, weights):
+    print(itemset)
     total_weight = sum(weights)
-    itemset_weight = sum([weights[i] for i, transaction in enumerate(transactions) if set(itemset).issubset(set(transaction))])
+    itemset_weight = 0
+    for i, transaction in enumerate(transactions):
+        print(transaction)
+
+        if set(itemset).issubset(set(transaction)):
+            print('y')
+            itemset_weight += weights[i]
+        else:
+            if(itemset  in transaction ):
+                print("test")
+                itemset_weight += weights[i]
+
     return itemset_weight / total_weight
 
 def get_item_weight(data,weights):
@@ -25,6 +37,7 @@ def get_item_weight(data,weights):
     for transaction in data:
         for item in transaction:
             item_weights[item] =calculate_wsp(item,data,weights)
+    print(item_weights)    
     return item_weights
 
 def get_weighted_itemsets(data, min_support,weights):
