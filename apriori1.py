@@ -16,18 +16,13 @@ def load_data(file_path,column):
 
 # Function to calculate weighted support
 def calculate_wsp(itemset, transactions, weights):
-    print(itemset)
     total_weight = sum(weights)
     itemset_weight = 0
     for i, transaction in enumerate(transactions):
-        print(transaction)
-
         if set(itemset).issubset(set(transaction)):
-            print('y')
             itemset_weight += weights[i]
         else:
             if(itemset  in transaction ):
-                print("test")
                 itemset_weight += weights[i]
 
     return itemset_weight / total_weight
@@ -37,13 +32,13 @@ def get_item_weight(data,weights):
     for transaction in data:
         for item in transaction:
             item_weights[item] =calculate_wsp(item,data,weights)
-    print(item_weights)    
+    #print(item_weights)    
     return item_weights
 
 def get_weighted_itemsets(data, min_support,weights):
     item_weights = get_item_weight(data,weights)
     weighted_itemsets = [frozenset({item}) for item, count in item_weights.items() if count >= min_support]
-    print('frequent ',weighted_itemsets)
+    #print('frequent ',weighted_itemsets)
     k = 2
     while weighted_itemsets:
         itemsets = set()
@@ -81,9 +76,9 @@ def get_association_rules(weighted_itemsets, min_confidence, data,weights):
 
 
 # Set minimum support and minimum confidence thresholds
-min_support = 0.5
+min_support = 0.2
 min_confidence = 0.5
-data,Profit = load_data('test.csv',3)
+data,Profit = load_data('SampleSuperstore.csv',11)
 # Select the column to use for
 #print("Column names:", list(test))
 #column = int(input("Enter the column to use for item weights: "))
@@ -91,9 +86,6 @@ data,Profit = load_data('test.csv',3)
 #print('test')
 weighted_itemsets = get_weighted_itemsets(data, min_support,Profit)
 association_rules = get_association_rules(weighted_itemsets, min_confidence,data,Profit)
-print("Frequent itemsets:")
-for itemset in weighted_itemsets:
-    print(list(itemset))
 
 print("\nAssociation rules:")
 for antecedent, consequent, confidence in association_rules:
