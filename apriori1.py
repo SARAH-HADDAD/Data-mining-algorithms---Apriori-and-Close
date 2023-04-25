@@ -18,8 +18,6 @@ def load_data(file_path,column):
 def calculate_wsp(itemset, transactions, weights):
     total_weight = sum(weights)
     itemset_weight = sum([weights[i] for i, transaction in enumerate(transactions) if set(itemset).issubset(set(transaction))])
-    #print(itemset)
-    #print(itemset_weight / total_weight)
     return itemset_weight / total_weight
 
 def get_item_weight(data,weights):
@@ -31,8 +29,6 @@ def get_item_weight(data,weights):
 
 def get_weighted_itemsets(data, min_support,weights):
     item_weights = get_item_weight(data,weights)
-    #total_weight = sum(weights)
-    #weighted_itemsets = [frozenset({item}) for transaction in data for item in transaction if calculate_wsp(frozenset({item}), data, weights) >= min_support]
     weighted_itemsets = [frozenset({item}) for item, count in item_weights.items() if count >= min_support]
     print('frequent ',weighted_itemsets)
     k = 2
@@ -45,7 +41,6 @@ def get_weighted_itemsets(data, min_support,weights):
                     itemsets.add(new_itemset)
         frequent_itemsets_k = set()
         for itemset in itemsets:
-            #itemset_count = sum(1 for transaction in data if itemset.issubset(transaction))
             if  calculate_wsp(itemset,data,weights)>= min_support:
                 frequent_itemsets_k.add(itemset)
         if not frequent_itemsets_k:
@@ -55,7 +50,6 @@ def get_weighted_itemsets(data, min_support,weights):
     return weighted_itemsets
 
 def get_association_rules(weighted_itemsets, min_confidence, data,weights):
-    #num_transactions = len(data)
     association_rules = []
     for itemset in weighted_itemsets:
         if len(itemset) < 2:
@@ -76,8 +70,6 @@ def get_association_rules(weighted_itemsets, min_confidence, data,weights):
 # Set minimum support and minimum confidence thresholds
 min_support = 0.5
 min_confidence = 0.5
-#min_significance = 0.5
-# Load data
 data,Profit = load_data('test.csv',3)
 # Select the column to use for
 #print("Column names:", list(test))
