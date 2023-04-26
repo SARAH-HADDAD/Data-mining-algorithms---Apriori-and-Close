@@ -4,14 +4,15 @@ from tkinter import messagebox
 import subprocess
 import csv
 from apriori import load_data, get_weighted_itemsets, get_association_rules
+from Close import CloseAlgorithm, Load_data, CalculateSupport
 class AssociationRulesGUI:
     
     def __init__(self, master):
         self.master = master
         master.title("Association Rules")
-        master.geometry("500x350") # set window size
+        master.geometry("400x220") # set window size
 
-        self.label = tk.Label(master, text="Please select the algorithm and dataset file.")
+        self.label = tk.Label(master, text="\n Please select the algorithm and dataset file.")
         self.label.pack()
 
         self.algorithm_var = tk.StringVar(master)
@@ -86,7 +87,21 @@ class AssociationRulesGUI:
             rule_text.pack()
             for antecedent, consequent, confidence in association_rules:
                 rule_text.insert(tk.END, f"{set(antecedent)} => {set(consequent)} (confidence={confidence:.3f})\n\n")
-
+        else:
+            min_support = self.min_support_entry.get()
+            if not min_support:
+                messagebox.showwarning("Missing Parameter", "Please enter the minimum support value.")
+                return     
+            data=Load_data(self.dataset_path)
+            rules=CloseAlgorithm(data, float(min_support))      
+            # Display the association rules in a new window
+            rule_window = tk.Toplevel(self.master)
+            rule_window.title("Association Rules")
+            rule_text = tk.Text(rule_window, wrap=tk.WORD)
+            rule_text.pack()
+            # Print the rules    
+            for key, value in rules.items():
+                rule_text.insert(tk.END, f"{key} --> {value}\n\n")
 root = tk.Tk()
 gui = AssociationRulesGUI(root)
 root.mainloop()
