@@ -10,7 +10,6 @@ def load_data(file_path,column):
         header = next(reader)
         for row in reader:
             data.append(row)
-            print(row[column])
             Profit.append(float(row[column])) 
     return data, Profit
 
@@ -31,14 +30,12 @@ def get_item_weight(data,weights):
     item_weights = defaultdict(int) 
     for transaction in data:
         for item in transaction:
-            item_weights[item] =calculate_wsp(item,data,weights)
-    #print(item_weights)    
+            item_weights[item] =calculate_wsp(item,data,weights) 
     return item_weights
 
 def get_weighted_itemsets(data, min_support,weights):
     item_weights = get_item_weight(data,weights)
     weighted_itemsets = [frozenset({item}) for item, count in item_weights.items() if count >= min_support]
-    #print('frequent ',weighted_itemsets)
     k = 2
     while weighted_itemsets:
         itemsets = set()

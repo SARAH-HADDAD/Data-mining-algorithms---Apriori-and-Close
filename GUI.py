@@ -1,10 +1,11 @@
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
-import subprocess
-import csv
-from apriori import load_data, get_weighted_itemsets, get_association_rules
+from apriori import load_data, get_weighted_itemsets, get_association_rules,get_item_weight
 from Close import CloseAlgorithm, Load_data, CalculateSupport
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from collections import defaultdict
 class AssociationRulesGUI:
     
     def __init__(self, master):
@@ -77,8 +78,16 @@ class AssociationRulesGUI:
                 return           
             # Load the data from the selected file
             data,weights = load_data(self.dataset_path,int(weight_column))
-            print(type(min_support))
             weighted_itemsets = get_weighted_itemsets(data,float(min_support),weights)
+            item_weight=get_item_weight(data,weights)
+            # Plot the pie chart
+            labels = list(item_weight.keys())
+            sizes = list(item_weight.values())
+            fig, ax = plt.subplots()
+            ax.pie(sizes, labels=labels, autopct='%1.1f%%')
+            ax.axis('equal')
+            plt.title("items weights")
+            plt.show()
             association_rules = get_association_rules(weighted_itemsets, float(min_confidence),data,weights)
             # Display the association rules in a new window
             rule_window = tk.Toplevel(self.master)
