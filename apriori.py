@@ -1,6 +1,35 @@
 import csv
 from itertools import combinations
 from collections import defaultdict
+def predict_min_weighted_support(data, weights):
+    num_transactions=len(data)
+    num_items=len(set(item for transaction in data for item in transaction))
+    # calculate average weight
+    avg_weight = sum(weights) / len(weights)
+    
+    # calculate skewness of weight distribution
+    weight_variance = sum((w - avg_weight) ** 2 for w in weights) / len(weights)
+    weight_stddev = weight_variance ** 0.5
+    skewness = sum((w - avg_weight) ** 3 for w in weights) / (len(weights) * weight_stddev ** 3)
+    
+    # predict optimal min_weighted_support
+    min_support = 0.05
+    if num_transactions > 1000:
+        min_support = 0.02
+    elif num_transactions > 500:
+        min_support = 0.03
+    elif num_transactions > 100:
+        min_support = 0.04
+    
+    if num_items > 50:
+        min_support += 0.02
+    elif num_items > 100:
+        min_support += 0.03
+    
+    if skewness > 1:
+        min_support -= 0.01
+    
+    return min_support
 
 def load_data(file_path,column):
     data = []
@@ -78,9 +107,10 @@ def get_association_rules(weighted_itemsets, min_confidence, data,weights):
 
 
 # Set minimum support and minimum confidence thresholds
-min_support = 0.05
-min_confidence = 0.5
 data,Profit = load_data('Supermart_Grocery_Sales.csv',9)
+min_support = predict_min_weighted_support(data, Profit)
+print('mins_support=',min_support)
+min_confidence = 0.5
 # Select the column to use for
 #print("Column names:", list(test))
 #column = int(input("Enter the column to use for item weights: "))
