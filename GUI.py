@@ -81,13 +81,17 @@ class AssociationRulesGUI:
             weighted_itemsets = get_weighted_itemsets(data,float(min_support),weights)
             item_weight=get_item_weight(data,weights)
             # Plot the pie chart
+            figure_window = tk.Toplevel(self.master)
+            figure_window.title("items weights")
             labels = list(item_weight.keys())
             sizes = list(item_weight.values())
             fig, ax = plt.subplots()
             ax.pie(sizes, labels=labels, autopct='%1.1f%%')
             ax.axis('equal')
-            plt.title("items weights")
-            plt.show()
+            # Embed the figure in a Tkinter canvas
+            canvas = FigureCanvasTkAgg(fig, master=figure_window)
+            canvas.draw()
+            canvas.get_tk_widget().pack()
             association_rules = get_association_rules(weighted_itemsets, float(min_confidence),data,weights)
             # Display the association rules in a new window
             rule_window = tk.Toplevel(self.master)
