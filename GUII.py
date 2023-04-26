@@ -32,6 +32,13 @@ class AssociationRulesGUI:
         self.min_support_entry.pack(side=tk.LEFT)
         self.apriori_frame.pack()
 
+        self.min_confidence_frame = tk.Frame(master)
+        self.min_confidence_label = tk.Label(self.min_confidence_frame, text="Minimum Confidence")
+        self.min_confidence_label.pack(side=tk.LEFT)
+        self.min_confidence_entry = tk.Entry(self.min_confidence_frame)
+        self.min_confidence_entry.pack(side=tk.LEFT)
+        self.min_confidence_frame.pack()
+
         self.close_frame = tk.Frame(master)
         self.weight_column_label = tk.Label(self.close_frame, text="Weight Column (0-indexed)")
         self.weight_column_label.pack(side=tk.LEFT)
@@ -60,6 +67,9 @@ class AssociationRulesGUI:
             if not min_support:
                 messagebox.showwarning("Missing Parameter", "Please enter the minimum support value.")
                 return
+            min_confidence = self.min_confidence_entry.get()
+            if not min_confidence:
+                messagebox.showwarning("Missing Parameter", "Please enter the minimum confidence value.")            
             weight_column = self.weight_column_entry.get()
             if not weight_column:
                 messagebox.showwarning("Missing Parameter", "Please enter the weight column index.")
@@ -68,8 +78,7 @@ class AssociationRulesGUI:
             data,weights = load_data(self.dataset_path,int(weight_column))
             print(type(min_support))
             weighted_itemsets = get_weighted_itemsets(data,float(min_support),weights)
-            min_confidence=0.5
-            association_rules = get_association_rules(weighted_itemsets, min_confidence,data,weights)
+            association_rules = get_association_rules(weighted_itemsets, float(min_confidence),data,weights)
             # Display the association rules in a new window
             rule_window = tk.Toplevel(self.master)
             rule_window.title("Association Rules")
