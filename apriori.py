@@ -8,14 +8,14 @@ def load_data(file_path,column):
     with open(file_path, 'r') as f:
         reader = csv.reader(f)
         header = next(reader)
-        print(header)
         for row in reader:
             data.append(row)
+            print(row[column])
             Profit.append(float(row[column])) 
     return data, Profit
 
 # Function to calculate weighted support
-def calculate_wsp(itemset, transactions, weights):
+def calculate_wsp(itemset, transactions, weights): #min sup pondere
     total_weight = sum(weights)
     itemset_weight = 0
     for i, transaction in enumerate(transactions):
@@ -41,7 +41,6 @@ def get_weighted_itemsets(data, min_support,weights):
     #print('frequent ',weighted_itemsets)
     k = 2
     while weighted_itemsets:
-        #print(k)
         itemsets = set()
         for i, itemset1 in enumerate(weighted_itemsets):
             for itemset2 in weighted_itemsets[i+1:]:
@@ -74,15 +73,3 @@ def get_association_rules(weighted_itemsets, min_confidence, data,weights):
                 if confidence >= min_confidence :
                     association_rules.append((antecedent, consequent, confidence))
     return association_rules
-
-data,Profit = load_data('test.csv',3)
-min_support = 0.4
-print('min_support=',min_support)
-min_confidence = 0.5
-weighted_itemsets = get_weighted_itemsets(data, min_support,Profit)
-association_rules = get_association_rules(weighted_itemsets, min_confidence,data,Profit)
-
-print("\nAssociation rules:")
-for antecedent, consequent, confidence in association_rules:
-    print(list(antecedent), "=>", list(consequent), ", confidence:", round(confidence, 2), ")")
-print("\n")

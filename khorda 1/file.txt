@@ -1,2 +1,0 @@
-vous souhaitez ajouter du poids aux attributs 
-pour les prendre en compte dans le calcul de la fréquence des itemsets et ainsi avoir une meilleure analyse des règles d'association.
